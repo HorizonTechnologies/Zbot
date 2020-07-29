@@ -1,10 +1,11 @@
 # Zbot Setup
 
 For zbot specifications visit here
+
 Go to: [https://api.slack.com/apps](https://api.slack.com/apps)
 Here You can see a button to create a app
 ![](https://raw.githubusercontent.com/HorizonTechnologies/Zapp/master/Setup/create.PNG)
-- Here Give the name the select the workspace
+- Here Give the name and select the workspace
 
 ![](https://raw.githubusercontent.com/HorizonTechnologies/Zapp/master/Setup/slack.PNG)
 
