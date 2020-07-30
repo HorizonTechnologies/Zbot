@@ -26,7 +26,7 @@ load_dotenv()
 
 SLACK_BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN")
 SLACK_SIGNIN_SECRET = os.getenv("SLACK_SIGNIN_SECRET")
-SLACK_VERIFICATION_TOKEN = os.getenv("SLACK_VERIFICATION_TOKEN)
+SLACK_VERIFICATION_TOKEN = os.getenv("SLACK_VERIFICATION_TOKEN")
 
 #context=('/home/admin/cloudflare.cer.pem','/home/admin/cloudflare.privkey.pem')
 
