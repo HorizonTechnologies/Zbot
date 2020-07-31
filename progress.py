@@ -34,14 +34,6 @@ def insert(user, work,d):
         db.child("test").child(key).child("progress").child(date).push({user : work})
     except:
         print("failed to insert")
-data={
-        'q1':{
-            'ans1', 'ans2'},
-        'q2':{'ans2'},
-        'q3':{'ans3',"can't say"}
-        }
-
-data = {'What have you done today?': 'nope', 'What are your next plans': 'nope', 'Need help with anything': 'nope'}
 
 
 def dayoff(user):
