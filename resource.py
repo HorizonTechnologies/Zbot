@@ -17,7 +17,7 @@ def resources():
     
                 
                 
-def insertres(name, res):
+def insert(name, res):
     name = name.lower()
     res = res.lower()
     check = db.child("resources").get()
@@ -33,7 +33,7 @@ def insertres(name, res):
         print("resource inserted")    
         db.child("resources").push({name : res})
 
-def delresource(name):
+def delete(name):
     check = db.child("resources").get()
     if check.val()!=None:
         for l in check:
