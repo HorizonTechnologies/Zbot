@@ -1,48 +1,23 @@
 import register
+icon = 'https://img.icons8.com/emoji/96/000000/penguin--v2.png'
+
+
+
+
 def reminder(n,client):
-    channels = register.channelslist()
-    
-    if n=='0':
-        for channel in channels:
-            client.api_call(
-                      "chat.postMessage",
-                  as_user=True,
-                  channel=channel,
-                  text="Hey!, :wave: Fill in what you've done today",
-                  blocks= [
-    {
-        "type": "section",
-        "name":"tharun",
-        "text": {
-            "type": "mrkdwn",
-            "text": "Other quick actions"
-        },
-        "accessory": {
-            "type": "static_select",
-            "placeholder": {
-                "type": "plain_text",
-                "emoji": True,
-                "text": "Manage Here"
-            },
-            "options": [
-                {
-                    "text": {
-                        "type": "plain_text",
-                        "emoji": True,
-                        "text": "Request for a day-off"
-                    },
-                    "value": "dayoff"
-                }
-            ]
-        }
-    }
-]
-            )
+    userslist = client.api_call("users.list")
+    for s in userslist['members']:
+        if s['is_bot']!= True:
+            user = s['id']
+            
+            
+                
             client.api_call(
                   "chat.postMessage",
                   as_user=True,
-                  channel="D013ACB3V1A",
-                  text="Hey TEST!, :wave: Fill in what you've done today",
+                  channel=s['id'],
+                  icon_url=icon,
+                  text=f"Hey <@{user}>!, :wave: Fill in what you've done today",
                   attachments=[{
                     "text": "",
                     "callback_id":  "workform",
@@ -59,7 +34,8 @@ def reminder(n,client):
             client.api_call(
               "chat.postMessage",
               as_user=True,
-              channel="D013ACB3V1A",
+              channel=s['id'],
+              icon_url=icon,
               text="Glad, I\'m here to help in submitting your work data",
               blocks= [
         {
@@ -98,29 +74,5 @@ def reminder(n,client):
     ]
             )
 
-            
-            
-    if n=='1':
-        for channel in channels:
-        
-            client.api_call(
-                  "chat.postMessage",
-                  as_user=True,
-                  channel=channel,
-                  text="Hey TEST!, :wave: Fill in what you've done today",
-                  attachments=[{
-                    "text": "",
-                    "callback_id": user_id + "workform",
-                    "color": "#3AA3E3",
-                    "attachment_type": "default",
-                    "actions": [{
-                      "name": "workform",
-                      "text": "Submit Today\'s work",
-                      "type": "button",
-                      "value": "Work_data"
-                    }]
-                  }]
-                )
-    
-    
+   
     

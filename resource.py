@@ -1,46 +1,79 @@
-from db import conn
+#from db import conn
+import db
+import datetime
 
-db = conn()
-def resources():
-    
-    check = db.child("resources").get()
-    resource =[]
-    if check.val()!=None:
-        for l in check:
-            s = l.val()
-            for k in s.keys():
-                out =  k
-                out = out +" - "+s[k]
-                resource.append(out)
-        print("resources displayed")
-        return resource
-    
-                
-                
+conn = db.db()
+
+def show():
+    try:
+        cursor = conn.cursor()
+        query = """select * from resources """
+        cursor.execute(query)
+        record = cursor.fetchall()
+        #return record
+        print(record)
+
+        for res in record:
+            print(res[0])
+        return record
+    except:
+        print("err")
+     
 def insert(name, res):
     name = name.lower()
     res = res.lower()
-    check = db.child("resources").get()
-    insert = True
-    if check.val()==None:
-        db.child("resources").push({name : res})
-    else:
-        for l in check:
-            s = l.val()
-            for k in s.keys():
-                if k == name:
-                    return "Duplicate name"
-        print("resource inserted")    
-        db.child("resources").push({name : res})
 
-def delete(name):
-    check = db.child("resources").get()
-    if check.val()!=None:
-        for l in check:
-            s = l.val()
-            for k in s.keys():
-                if k == name:
-                    rem = l.key()
-                    db.child("resources").child(rem).remove()
-                    return "Deleted successfully"
+    try:
+        cursor = conn.cursor()
+        query = """select * from resources where title = %s"""
+        cursor.execute(query,(name, ))
+        count = cursor.rowcount
+        record = cursor.fetchall()
+        
+        #print(record)
+        print(count)
+        if count>=1:
+            return "Duplicate title, Please choose a different title"
+        #return record
+        
+        
+        
+    
+        
+        
+        query = """ INSERT INTO resources ( title, resource, ts) VALUES (%s, %s, %s)"""
+        
+        insert = (name,res,datetime.datetime.now())
+        
+        cursor.execute(query, insert)
 
+        conn.commit()
+        count = cursor.rowcount
+        
+        return "successfully inserted "+ name+" - "+ res
+
+    except:
+        print("failed to insert")
+               
+
+def delete(_id):
+    cursor = conn.cursor()
+    _id = int(_id)
+    
+    
+    query = """select * from resources where id = %s"""
+    cursor.execute(query,(_id, ))
+    count = cursor.rowcount
+    if count<1:
+        return "No record found, Refresh the resources"
+    record = cursor.fetchone()
+    
+    query = """DELETE FROM resources WHERE id = %s"""
+    cursor.execute(query,(_id,))
+    count = cursor.rowcount
+    conn.commit()
+    return record[1]+" - "+record[2]+ "Successfully deleted"
+    print(count)
+
+
+  
