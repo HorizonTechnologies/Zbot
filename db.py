@@ -1,16 +1,29 @@
-import pyrebase
+from datetime import datetime
+import os
+import psycopg2
+from dotenv import load_dotenv
 
-def conn():
-    config = {
-        "apiKey": "AIzaSyAPKL-MQVLicodVmUuOWCnR-SgyKs2U_xs",
-        "authDomain": "test-31c49.firebaseapp.com",
-        "databaseURL": "https://test-31c49.firebaseio.com",
-        "projectId": "test-31c49",
-        "storageBucket": "test-31c49.appspot.com",
-        "messagingSenderId": "284466329659",
-     
-        }
-    firebase = pyrebase.initialize_app(config)
+load_dotenv()
+import json
+def db():
+    try:
+        
+        user =  os.getenv("user")
+        password = os.getenv("password")
+        host = os.getenv("host")
+        port = os.getenv("port")
+        database = os.getenv("database")
+        print(user)
+        print(password)
+        connection = psycopg2.connect(user =user,
+                                      password = password,
+                                      host = host,
+                                      port = port,
+                                      database = database)
 
-    db = firebase.database()
-    return db
+        
+        
+        return connection
+    except (Exception, psycopg2.Error) as error :
+        print ("Error while connecting to PostgreSQL", error)
+    

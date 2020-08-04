@@ -1,6 +1,6 @@
 import datetime
 import time
-from db import conn
+import db
 import json
 
 
@@ -8,32 +8,44 @@ datetoday = datetime.date.today()
 tomorrow =datetoday + datetime.timedelta(1)
 yesterday =datetoday + datetime.timedelta(-1)
 
-db = conn()
+conn = db.db()
 
 
 
 
 
-def getid(user):
-    check = db.child("test").get()
-    if check.val()!=None:
-        for l in check:
-            s = l.val()
-            for k in s.keys():
-                if s[k] == user:
-                    key = l.key()
-                    return key
 
-def insert(user, work,d):
+
+
+def insert2(userid,data,d):
     if d==0:
         date = str(datetoday)
     else:
         date = str(tomorrow)
     try:
-        key = getid(user)
-        db.child("test").child(key).child("progress").child(date).push({user : work})
+    
+        cursor = conn.cursor()
+        data = json.dumps(data)
+        query = """ INSERT INTO standup1 ( slack_id, report, ts) VALUES (%s, %s, %s)"""
+        insert = (userid,data,datetime.datetime.now())
+        cursor.execute(query, insert)
+
+        
+        count = cursor.rowcount
+        conn.commit()
+        print (count, "Record inserted successfully into mobile table")
+
     except:
         print("failed to insert")
+
+
+def show(user):
+    cursor = conn.cursor()
+    query = """select report from standup1 where slack_id = %s and ts > %s """
+    cursor.execute(query, (user, datetoday, ))
+    record = cursor.fetchall()
+    return record
+    print(record)
 
 
 def dayoff(user):
@@ -50,51 +62,5 @@ def dayoff(user):
             
         else:
             db.child("dayoffs").child(date).push(user)
-        
-def insert1(user, data,d):
-    print(data)
-    question = "What have you done today?"
-    
-   
-    todaydata = data[question]
-   
-
-   
-    date = str(datetoday)
-    
-    key = getid(user)
-    try:
-        if question in data.keys():
-            db.child("test").child(key).child("progress").child(date).push({user: todaydata})
-        db.child("test").child(key).child("standup").child(date).push(data)
-    except:
-        return "Failed"
 
 
-def showprogress(user):
-    key = getid(user)
-    days = ['today','yesterday','tomorrow']
-    progress = {}
-    dates = [str(datetoday), str(yesterday),str(tomorrow)]
-    n = 0
-   
-    #for date in dates:
-    date = str(datetoday)
-    check = db.child("test").child(key).child("standup").child(date).get()
-    if check.val()!=None:
-        print('w')
-        data = check.val().values()
-        temp =[]
-        for l in data:
-            
-            for s in l:
-                
-                if 'tomorrow' in s:
-                    
-                    temp.append(l[s])
-                    progress['tomorrow']=temp
-                    n=n+1
-        
-    
-      
-    return progress
