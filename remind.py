@@ -1,4 +1,4 @@
-import register
+
 def reminder(n,client):
     channels = register.channelslist()
     

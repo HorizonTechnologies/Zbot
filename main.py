@@ -11,8 +11,7 @@ import resource as resourcemodule
 
 import progress 
 import remind
-import register
-import customremind
+
 import time
 import requests
 
@@ -64,7 +63,10 @@ def _reminders():
   
 #getting bot info
 response = slack_client.api_call("auth.test")
-botid = response['user_id']
+try:
+    botid = response['user_id']
+except:
+    print("err")
 
 
 
@@ -875,6 +877,6 @@ if __name__ == "__main__":
     
     """
     Thread(target=_reminders,daemon=True).start()
-    app.run(port=3000)
+    app.run(port=3001)
     #app.run(host='0.0.0.0', port=8443, ssl_context=context)
 
