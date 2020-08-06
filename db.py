@@ -13,8 +13,7 @@ def db():
         host = os.getenv("host")
         port = os.getenv("port")
         database = os.getenv("database")
-        print(user)
-        print(password)
+        
         connection = psycopg2.connect(user =user,
                                       password = password,
                                       host = host,
