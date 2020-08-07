@@ -2,7 +2,11 @@
 
 Configuring Zbot in slack : [App Setup documentation](https://github.com/HorizonTechnologies/Zbot/blob/master/Setup/Setup.md)
 
+Zbot specifications : [zbot features and specs](https://github.com/HorizonTechnologies/spec/blob/master/Zbot.md)
+
 Zbot, A horizon slackbot. after a student gets registered successfully with the zbot, He/she can be able to use the Zbot full functional.
+
+Features :
 
 What do we have now?
 

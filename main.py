@@ -53,6 +53,7 @@ schedule.every().day.at("11:00").do(remind.reminder,'0',slack_client)
 schedule.every().day.at("20:00").do(remind.reminder,'0',slack_client)
 
 
+                                
 
 def _reminders():
     """
@@ -86,12 +87,12 @@ def _message_actions():
     message_action = json.loads(request.form["payload"])
     
     
-                                
+                              
     user_id = message_action["user"]["id"]
     channel_id = message_action['channel']['id']
     
     if message_action["type"] == "interactive_message":
-        print(message_action["trigger_id"])
+        
         # Add the message_ts to the user's order info
         for actions in message_action['actions']:
             if actions['name']=="workform":
@@ -139,6 +140,11 @@ def _message_actions():
         action = message_action.get('actions')
         
         actiontype = action[0]['type']
+
+        if actiontype == 'channels_select':
+            channel = action[0]['selected_channel']
+            
+            
         
         if actiontype=='button':
             text = action[0]['text']['text']
@@ -281,15 +287,14 @@ def _message_actions():
 
 @slack_events_adapter.on("message")
 def _handle_message(event_data):
-    print("g")
+    
     """
     Receiving message events from the slack
     The payload received will be sent to another function by a different thread, then HTTP 200 
     Reponse will be sent back to the slack
     """
     global preveventid
-    print(event_data)
-    print(event_data['event_id'])
+    
     if preveventid == event_data['event_id']:
         return make_response("", 200)
     else:
@@ -318,12 +323,11 @@ def _handling_message(event_data):
     if verification(event_data['token']):
         return make_response("", 200)
         
-
+    
     global prevtext
     data = event_data["event"]
     channel_id = data["channel"]
     
-    print(data['text'])
     
     chainmessages = ['What have you done today?',
                      "What are your next plans",
@@ -350,10 +354,13 @@ def _handling_message(event_data):
                                             icon_url=icon,
                                             )
                         if n == len(chainmessages)-1:
-                            print(usersdata[user_id])
+                            
                             progress.insert2(user_id, usersdata[user_id],0)
-                            print(usersdata)
+                            
+                            val =""
                             for response in usersdata[user_id]:
+                                val = val+  "*"+response+"*" +"\n "+usersdata[user_id][response]+"\n"
+                                
                                 
                                 slack_client.api_call(
                                 "chat.postMessage",
@@ -368,6 +375,40 @@ def _handling_message(event_data):
                                                     
                                                   }]
                                                 )
+                                
+                            
+                            
+                            channels = ['C014HRAMS6P', 'C0130DR9THB']
+                            for channel in channels:
+                                
+                                slack_client.api_call(
+                                                "chat.postMessage",
+                                                channel=channel,
+                                                
+                                                text= "Your responses",
+                                                icon_url=icon,
+                                                                        
+                                                blocks= [
+                                                    {
+                                                    "type": "section",
+                                                    "text": {
+                                                            "type": "mrkdwn",
+                                                            "text": f" :bell: <@{user_id}> has submitted a report!"
+                                                            }
+                                                    },
+                                                    {
+                                                    "type": "section",
+                                                    "text": {
+                                                            "type": "mrkdwn",
+                                                            "text": val
+                                                            }
+                                                    }]
+                                            )
+                                                
+                            #channels = adminactions.getchannel()
+                            
+                            
+                            
                             
        
     prevtext = data['text']
@@ -517,21 +558,28 @@ def _handling_message(event_data):
         "type": "section",
         "text": {
             "type": "mrkdwn",
-            "text": "*2️⃣ `Submit` command*. Type `sbumit` To submit your today's report"
+            "text": "*1️⃣ `Submit` command*. Type `sbumit` To submit your today's report"
         }
     },
     {
         "type": "section",
         "text": {
             "type": "mrkdwn",
-            "text": "*3️⃣ `Show` command*. Type `Show` command to display your today"
+            "text": "*2️⃣ `Show` command*. Type `Show` command to display your today"
         }
     },
     {
         "type": "section",
         "text": {
             "type": "mrkdwn",
-            "text": "*4️⃣ `Resources` command*. Type `resources` to display the resources of the HorizonTech that you will be working on"
+            "text": "*3️⃣ `Resources` command*. Type `resources` to display the resources of the HorizonTech that you will be working on"
+        }
+    },
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "4️⃣ Zbot is really friendly, type `joke`, zbot will send a funny joke to you. More features are on the way"
         }
     }
 ] )
@@ -752,8 +800,7 @@ def _handling_message(event_data):
                 
                 
             elif dat.startswith("resources"):
-                print("show resource command running")
-                print("test")
+                
                 resource = resourcemodule.show()
                 slack_client.api_call(
             "chat.postMessage",
