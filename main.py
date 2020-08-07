@@ -255,15 +255,7 @@ def _message_actions():
             val = 'Under Construction'
         elif callbackid.startswith('resourceadd'):
             formdata = message_action['submission']
-            val = resourcemodule.insert(formdata['resource'],formdata['link'])
-        elif callbackid.startswith('workdata'):
-            todaywork = formdata['todayplan']
-            yesterdaywork = formdata['submission']['yesterdaywork']
-            
-        #inserting into  ( '0'- today and '1'-yesterdays)
-            progress.insert(user_id,todaywork, 0)
-            progress.insert(user_id,yesterdaywork, 1)
-            val = message_action['submission']['todayplan'] +" \n  You have done '"+message_action['submission']['yesterdaywork']+"' yesterday"
+            val = resourcemodule.insert(formdata['resource'],formdata['link'],user_id)
         
         slack_client.api_call(
             "chat.postMessage",
@@ -294,17 +286,12 @@ def _handle_message(event_data):
     Reponse will be sent back to the slack
     """
     global preveventid
-    
-    if preveventid == event_data['event_id']:
-        return make_response("", 200)
-    else:
-        preveventid = event_data['event_id']
-        
+     
     #threading a new process to handle the messages
-        Thread(target=_handling_message,args=(event_data,),daemon=True).start()
-       
-        #returning the post request with HTTP 200
-        return make_response("", 200)
+    Thread(target=_handling_message,args=(event_data,),daemon=True).start()
+   
+    #returning the post request with HTTP 200
+    return make_response("", 200)
         
     
 def verification(token):
@@ -410,8 +397,10 @@ def _handling_message(event_data):
                             
                             
                             
-       
-    prevtext = data['text']
+    try:  
+        prevtext = data['text']
+    except:
+        print("not that ")
    
     if data.get("subtype") is None:
         data = event_data["event"]

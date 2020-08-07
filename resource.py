@@ -19,7 +19,7 @@ def show():
     except:
         print("err")
      
-def insert(name, res):
+def insert(name, res, user):
     name = name.lower()
     res = res.lower()
 
@@ -41,9 +41,9 @@ def insert(name, res):
     
         
         
-        query = """ INSERT INTO resources ( title, resource, ts) VALUES (%s, %s, %s)"""
+        query = """ INSERT INTO resources ( slack_id,title, resource, ts) VALUES (%s,%s, %s, %s)"""
         
-        insert = (name,res,datetime.datetime.now())
+        insert = (user, name,res,datetime.datetime.now())
         
         cursor.execute(query, insert)
 
