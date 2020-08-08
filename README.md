@@ -1,4 +1,4 @@
-# Zapp
+# Zbot
 
 Configuring Zbot in slack : [App Setup documentation](https://github.com/HorizonTechnologies/Zbot/blob/master/Setup/Setup.md)
 
