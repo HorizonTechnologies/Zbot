@@ -902,8 +902,8 @@ if __name__ == "__main__":
     
     """
     port = os.getenv("local_port")
-    print(port)
+    
     host = os.getenv("server_host")
     Thread(target=_reminders,daemon=True).start()
-    app.run(port=int(port))
-    #app.run(host=host, port=port, ssl_context=context)
+    
+    app.run(host=host, port=int(port), ssl_context=context)
