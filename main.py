@@ -467,7 +467,7 @@ def _handling_message(event_data):
                             
                             
                             channel = os.getenv("channel")
-                            print(channel)
+                            
                             slack_client.api_call(
                                 "chat.postMessage",
                                 channel= channel,
