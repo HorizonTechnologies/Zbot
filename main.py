@@ -229,7 +229,13 @@ def _message_actions():
                 blocks.divider(slack_client,channel_id)
             if option == 'report':
                 
-                
+                slack_client.api_call(
+                    "chat.postMessage",
+                    channel= channel_id,
+                    icon_url=icon,
+                    text= f":thumbsup: <@{user_id}> Please let us know your progress",
+                    attachments=[]
+                )
                 slack_client.api_call(
                     "chat.postMessage",
                     channel= channel_id,
@@ -901,7 +907,7 @@ if __name__ == "__main__":
     We are running the reminders() in a different thread to have both actions performed independently
     
     """
-    port = os.getenv("local_port")
+    port = int(os.getenv("local_port"))
     
     host = os.getenv("server_host")
     Thread(target=_reminders,daemon=True).start()
