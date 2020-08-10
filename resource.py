@@ -4,6 +4,10 @@ import datetime
 
 conn = db.db()
 
+icon = 'https://img.icons8.com/emoji/96/000000/penguin--v2.png'
+
+
+
 def show():
     try:
         cursor = conn.cursor()
@@ -18,6 +22,86 @@ def show():
         return record
     except:
         print("err")
+
+def showresources(slack_client, channel):
+    slack_client.api_call(
+            "chat.postMessage",
+                                channel=channel,
+                                text="",
+                                icon_url=icon,
+                                blocks= [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Add a new resource"
+            }
+        },
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Add Resource",
+                        "emoji": True
+                    },
+                    "value": "resourceadd"
+                }
+            ]
+        }
+    ]          
+                                )
+    resource = show()
+    for res in resource:
+                    
+                        
+                        
+        
+        slack_client.api_call(
+"chat.postMessage",
+                    channel=channel,
+                    text=res[1] +" - "+ res[2],
+                    icon_url=icon,
+            )
+        slack_client.api_call(
+                        "chat.postMessage",
+                        channel=channel,
+                        text=res,
+                        icon_url=icon,
+                        blocks= [
+                                {
+                                "type": "actions",
+                                "elements": [
+                                    
+                                    {
+                                        "type": "button",
+                                        "text": {
+                                            "type": "plain_text",
+                                            "emoji": True,
+                                            "text": "Update"
+                                            
+                                        },
+                                        "style": "danger",
+                                        "value": "resource"+str(res[0])
+                                    },
+                                    {
+                                        "type": "button",
+                                        "text": {
+                                            "type": "plain_text",
+                                            "emoji": True,
+                                            "text": "Delete"
+                                        },
+                                        "style": "danger",
+                                        "value": "resource"+str(res[0])
+                                    }
+                                ]
+                                }
+                                ]
+                        
+                        )
+
      
 def insert(name, res, user):
     name = name.lower()

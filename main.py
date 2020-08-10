@@ -1,4 +1,3 @@
-
 from flask import Flask, request, make_response, Response
 import os
 import json
@@ -12,9 +11,10 @@ import resource as resourcemodule
 
 import progress 
 import remind
-
+import blocks
 import time
 import requests
+import custom
 
 
 from dotenv import load_dotenv
@@ -22,15 +22,21 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-icon = 'https://img.icons8.com/emoji/96/000000/penguin--v2.png'
+icon = custom.icon
 preveventid = ""
 prevtext=""
 usersdata = {}
+chainmessages = ['What have you done today?',
+                     "What are your next plans",
+                     "Need help with anything"]
+
+
+
 SLACK_BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN")
 SLACK_SIGNIN_SECRET = os.getenv("SLACK_SIGNIN_SECRET")
 SLACK_VERIFICATION_TOKEN = os.getenv("SLACK_VERIFICATION_TOKEN")
 
-#context=('/home/admin/cloudflare.cer.pem','/home/admin/cloudflare.privkey.pem')
+context=(os.getenv("certificate"),os.getenv("private_key"))
 
 
 # Slack client 
@@ -48,9 +54,9 @@ commands = ['hello','hello','help','joke']
 
 #schduling messages
 
-schedule.every().day.at("11:00").do(remind.reminder,'0',slack_client)
+schedule.every().day.at(custom.time1).do(remind.reminder,'0',slack_client)
 
-schedule.every().day.at("20:00").do(remind.reminder,'0',slack_client)
+schedule.every().day.at(custom.time2).do(remind.reminder,'0',slack_client)
 
 
                                 
@@ -98,40 +104,22 @@ def _message_actions():
             if actions['name']=="workform":
      
         # Show the ordering dialog to the user
-                chainmessages = ['What have you done today?',
-                     "What are your next plans",
-                     "Need help with anything"]
+                slack_client.api_call(
+                    "chat.postMessage",
+                    channel= channel_id,
+                    icon_url=icon,
+                    text= f"Hey <@{user_id}> Let's Start",
+                    attachments=[]
+                )
                 slack_client.api_call(
                         "chat.postMessage",
                         channel= channel_id,
                         text =chainmessages[0],
                         icon_url=icon,
                         attachments=[]
-                        )
-                open_dialog = slack_client.api_call(
-                    "dialg.open",
-                    trigger_id=message_action["trigger_id"],
-                    dialog={
-                        "title": "Daily Syncup",
-                        "submit_label": "Submit",
-                        "callback_id": user_id + "workform",
-                        
-                        
-                        "elements": [
-                {
-                    "type": "text",
-                    "label": "What have you done?",
-                    "name": "todayplan"
-                },
-                {
-                    "type": "text",
-                    "label": "What are your tomorrow plans?",
-                    "name": "yesterdaywork"
-                },
                 
-            ]
-                    } 
-                )
+                        )
+                
 
         
 
@@ -225,6 +213,7 @@ def _message_actions():
             option = action[0]['selected_option']['value']
            
             if option == 'dayoff':
+                
                 val = progress.dayoff(user_id)
                 slack_client.api_call(
                     "chat.postMessage",
@@ -233,14 +222,53 @@ def _message_actions():
                     text=val,
                     attachments=[]
                 )
-            if option == "pending":
+                blocks.divider(slack_client,channel_id)
+            if option == "resources":
+                
+                resourcemodule.showresources(slack_client, channel_id)
+                blocks.divider(slack_client,channel_id)
+            if option == 'report':
+                
+                
                 slack_client.api_call(
                     "chat.postMessage",
                     channel= channel_id,
                     icon_url=icon,
-                    text=":thumbsup: Great! Go ahead",
+                    text= chainmessages[0],
                     attachments=[]
                 )
+                
+                
+
+            if option == 'joke':
+                
+                url ="https://official-joke-api.appspot.com/random_joke"
+             
+                try:
+                    data = requests.get(url = url)
+                    data =data.content
+                    data = json.loads(data)
+                   
+                    slack_client.api_call(
+                "chat.postMessage",
+                                channel=channel_id,
+                                text= data['setup']+" "+ data['punchline'],
+                                icon_url=icon,
+                                )
+                except:
+                    slack_client.api_call(
+                "chat.postMessage",
+                                channel=channel_id,
+                                text= "Failed to load",
+                                icon_url=icon,
+                                )
+                blocks.divider(slack_client,channel_id)
+            if option == 'show':
+                
+                progress.report(user_id, channel_id, slack_client)
+                blocks.divider(slack_client,channel_id)
+            return make_response("", 200)
+
             
         
     elif message_action["type"] == "dialog_submission":
@@ -293,7 +321,76 @@ def _handle_message(event_data):
     #returning the post request with HTTP 200
     return make_response("", 200)
         
-    
+def quickactions(channel):
+    slack_client.api_call(
+                            "chat.postMessage",
+                            channel=channel,
+                            
+                            text= "Your responses",
+                            icon_url=icon,
+                            
+                            blocks= [
+                                {
+                                    "type": "section",
+                                    "text": {
+                                        "type": "mrkdwn",
+                                        "text": "What do you want?"
+                                    },
+                                    "accessory": {
+                                        "type": "static_select",
+                                        "placeholder": {
+                                            "type": "plain_text",
+                                            "text": "Quick actions",
+                                            "emoji": True
+                                        },
+                                        "options": [
+                                            {
+                                                "text": {
+                                                    "type": "plain_text",
+                                                    "text": "Report",
+                                                    "emoji": True
+                                                },
+                                                "value": "report"
+                                            },
+                                            {
+                                                "text": {
+                                                    "type": "plain_text",
+                                                    "text": "Resources",
+                                                    "emoji": True
+                                                },
+                                                "value": "resources"
+                                            },
+                                            {
+                                                "text": {
+                                                    "type": "plain_text",
+                                                    "text": "Request a dayoff",
+                                                    "emoji": True
+                                                },
+                                                "value": "dayoff"
+                                            },
+                                            {
+                                                "text": {
+                                                    "type": "plain_text",
+                                                    "text": "Your day reports",
+                                                    "emoji": True
+                                                },
+                                                "value": "show"
+                                            },
+                                            {
+                                                "text": {
+                                                    "type": "plain_text",
+                                                    "text": "joke",
+                                                    "emoji": True
+                                                },
+                                                "value": "joke"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ])
+
+                            
+
 def verification(token):
     if token != os.getenv('SLACK_VERIFICATION_TOKEN'):
         print('error')
@@ -316,9 +413,7 @@ def _handling_message(event_data):
     channel_id = data["channel"]
     
     
-    chainmessages = ['What have you done today?',
-                     "What are your next plans",
-                     "Need help with anything"]
+    
     if data.get("subtype") is None and data.get("user") != botid:
         user_id = data['user']
         if prevtext in chainmessages:
@@ -365,7 +460,38 @@ def _handling_message(event_data):
                                 
                             
                             
-                            channels = ['C014HRAMS6P', 'C0130DR9THB']
+                            channel = os.getenv("channel")
+                            print(channel)
+                            slack_client.api_call(
+                                "chat.postMessage",
+                                channel= channel,
+                                text="hj",
+
+                            )
+                            slack_client.api_call(
+                                                "chat.postMessage",
+                                                channel=channel,
+                                                
+                                                text= "Your responses",
+                                                icon_url=icon,
+                                                                        
+                                                blocks= [
+                                                    {
+                                                    "type": "section",
+                                                    "text": {
+                                                            "type": "mrkdwn",
+                                                            "text": f" :bell: <@{user_id}> has submitted a report!"
+                                                            }
+                                                    },
+                                                    {
+                                                    "type": "section",
+                                                    "text": {
+                                                            "type": "mrkdwn",
+                                                            "text": val
+                                                            }
+                                                    }]
+                                            )
+                            """
                             for channel in channels:
                                 
                                 slack_client.api_call(
@@ -391,6 +517,7 @@ def _handling_message(event_data):
                                                             }
                                                     }]
                                             )
+                            """
                                                 
                             #channels = adminactions.getchannel()
                             
@@ -529,50 +656,50 @@ def _handling_message(event_data):
             if dat == "help":
                 val = f"Welcome <@{user_id}>, I am your Horizon Zbot to help you in managing your progress. \n Kindly Register with your Unique slackid to get started \n Enter 'register <unique id>' \n 1. Use commands like 'today','next' to save your todays and tomorrows work data \n 2. Type 'show' to display your todays and tomorrows plans \n 3.Type 'Resources' to know about all the resources that we are in "                
                 slack_client.api_call(
-        "chat.postMessage",
-                channel=channel_id,
-                text=val,
-                icon_url=icon,
-                blocks =  [
-    {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
-            "text": "Hey there 👋 I'm Your Horizonslackbot . I'm here to help you create and manage tasks in Slack" 
+                        "chat.postMessage",
+                                channel=channel_id,
+                                text=val,
+                                icon_url=icon,
+                                blocks =  [
+                                {
+                                    "type": "section",
+                                    "text": {
+                                        "type": "mrkdwn",
+                                        "text": "Hey there 👋 I'm Your Horizonslackbot . I'm here to help you create and manage tasks in Slack" 
 
-                  }
-        },
-    
-    {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
-            "text": "*1️⃣ `Submit` command*. Type `sbumit` To submit your today's report"
-        }
-    },
-    {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
-            "text": "*2️⃣ `Show` command*. Type `Show` command to display your today"
-        }
-    },
-    {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
-            "text": "*3️⃣ `Resources` command*. Type `resources` to display the resources of the HorizonTech that you will be working on"
-        }
-    },
-    {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
-            "text": "4️⃣ Zbot is really friendly, type `joke`, zbot will send a funny joke to you. More features are on the way"
-        }
-    }
-] )
-       
+                                            }
+                                    },
+                                
+                                {
+                                    "type": "section",
+                                    "text": {
+                                        "type": "mrkdwn",
+                                        "text": "*1️⃣ `Submit` command*. Type `sbumit` To submit your today's report"
+                                    }
+                                },
+                                {
+                                    "type": "section",
+                                    "text": {
+                                        "type": "mrkdwn",
+                                        "text": "*2️⃣ `Show` command*. Type `Show` command to display your today"
+                                    }
+                                },
+                                {
+                                    "type": "section",
+                                    "text": {
+                                        "type": "mrkdwn",
+                                        "text": "*3️⃣ `Resources` command*. Type `resources` to display the resources of the HorizonTech that you will be working on"
+                                    }
+                                },
+                                {
+                                    "type": "section",
+                                    "text": {
+                                        "type": "mrkdwn",
+                                        "text": "4️⃣ Zbot is really friendly, type `joke`, zbot will send a funny joke to you. More features are on the way"
+                                    }
+                                }
+                            ] )             
+                quickactions(channel_id)
         
         elif dat.startswith("today") or dat.startswith("next") or dat.startswith("show") or dat.startswith("register ") or dat.startswith("resource add") or dat.startswith("resources") or dat.startswith("resource delete ") or dat.startswith("submit") or dat.startswith("remind "):
             """
@@ -709,43 +836,7 @@ def _handling_message(event_data):
             elif dat.startswith("show"):
                 colors = ['#EBB713', '#F91C3E', '#16A085', '#212F3D', '#F1C40F']
                 user = data['user']
-                report = progress.show(user)
-                
-                for response in report:
-                    val =""
-                    
-                    for res in response:
-                        for temp in res:
-                            val = val+ " *"+temp+"* " + "\n" + res[temp]
-                            val = val+"\n"
-                            
-                    slack_client.api_call(
-                                    "chat.postMessage",
-                                    channel=channel_id,
-                                    text= "Your responses",
-                                    icon_url=icon,
-                                                            
-                                    blocks= [
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": val
-			},
-                        }]
-                                )
-                    slack_client.api_call(
-                                    "chat.postMessage",
-                                    channel=channel_id,
-                                    text= "",
-                                    icon_url=icon,
-                                                            
-                                    blocks= [
-		{
-			"type": "divider",
-			
-                        }]
-                                )
+                progress.report(user, channel_id, slack_client)
                     
                            
                        
@@ -755,7 +846,7 @@ def _handling_message(event_data):
         
             elif dat.startswith("resource add"):
                 
-                
+                res="add"
                 slack_client.api_call(
             "chat.postMessage",
                                 channel=channel_id,
@@ -789,97 +880,19 @@ def _handling_message(event_data):
                 
                 
             elif dat.startswith("resources"):
+                resourcemodule.showresources(slack_client, channel_id)
                 
-                resource = resourcemodule.show()
-                slack_client.api_call(
-            "chat.postMessage",
-                                channel=channel_id,
-                                text="",
-                                icon_url=icon,
-                                blocks= [
-        {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": "Add a new resource"
-            }
-        },
-        {
-            "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Add Resource",
-                        "emoji": True
-                    },
-                    "value": "resourceadd"
-                }
-            ]
-        }
-    ]          
-                                )
                 
-                for res in resource:
-                    
-                        
-                        
-                    
-                    slack_client.api_call(
-            "chat.postMessage",
-                                channel=channel_id,
-                                text=res[1] +" - "+ res[2],
-                                icon_url=icon,
-            )
-                    slack_client.api_call(
-                "chat.postMessage",
-                                    channel=channel_id,
-                                    text=res,
-                                    icon_url=icon,
-                                    blocks= [
-            {
-                "type": "actions",
-                "elements": [
-                    
-                    {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "emoji": True,
-                            "text": "Update"
-                            
-                        },
-                        "style": "danger",
-                        "value": "resource"+str(res[0])
-                    },
-                    {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "emoji": True,
-                            "text": "Delete"
-                        },
-                        "style": "danger",
-                        "value": "resource"+str(res[0])
-                    }
-                ]
-            }
-        ]
-                                    
-                                    )
+                
                             
                    
             
     
     
-        
-        
-        
-                
+print(os.getenv("channel"))
                 
             
-            
+          
      
 
 if __name__ == "__main__":
@@ -888,6 +901,9 @@ if __name__ == "__main__":
     We are running the reminders() in a different thread to have both actions performed independently
     
     """
+    port = os.getenv("local_port")
+    print(port)
+    host = os.getenv("server_host")
     Thread(target=_reminders,daemon=True).start()
-    app.run(port=3001)
-    #app.run(host='0.0.0.0', port=8443, ssl_context=context)
+    app.run(port=int(port))
+    #app.run(host=host, port=port, ssl_context=context)

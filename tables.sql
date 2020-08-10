@@ -20,3 +20,12 @@ ts timestamp
 
 )
 
+create table dayoff(
+id serial primary key,
+slack_id varchar(30),
+ts timestamp
+
+
+
+)
+

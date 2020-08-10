@@ -11,7 +11,7 @@ yesterday =datetoday + datetime.timedelta(-1)
 conn = db.db()
 
 
-
+icon = 'https://img.icons8.com/emoji/96/000000/penguin--v2.png'
 
 
 
@@ -50,7 +50,26 @@ def show(user):
 
 def dayoff(user):
     date = str(datetoday)
-    
+    try:
+        cursor = conn.cursor()
+        query = """select * from dayoff where slack_id = %s"""
+        cursor.execute(query,(user, ))
+        count = cursor.rowcount
+        
+        #print(record)
+        
+        if count>=1:
+            return "You've already requested for a dayoff, today"
+        #return record
+
+        query = """ INSERT INTO dayoff ( slack_id , ts) VALUES (%s, %s)"""
+        insert = (user, datetime.datetime.now())
+        cursor.execute(query, insert)
+        return "You've requested for a dayoff"
+    except:
+        return "an error occured"
+
+
     check = db.child("dayoffs").child(date).get()
     if check.val()!=None:
         
@@ -64,3 +83,41 @@ def dayoff(user):
             db.child("dayoffs").child(date).push(user)
 
 
+def report(user,channel,slack_client):
+    report = show(user)
+                
+    for response in report:
+        val =""
+        
+        for res in response:
+            for temp in res:
+                val = val+ " *"+temp+"* " + "\n" + res[temp]
+                val = val+"\n"
+                
+        slack_client.api_call(
+                        "chat.postMessage",
+                        channel=channel,
+                        text= "Your responses",
+                        icon_url=icon,
+                                                
+                        blocks= [
+                                {
+                                "type": "section",
+                                "text": {
+                                    "type": "mrkdwn",
+                                    "text": val
+                                },
+                                            }]
+                                                    )
+        slack_client.api_call(
+                        "chat.postMessage",
+                        channel=channel,
+                        text= "",
+                        icon_url=icon,
+                                                
+                        blocks= [
+                                {
+                                    "type": "divider",
+                                    
+                                }]
+                    )

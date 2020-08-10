@@ -58,15 +58,7 @@ def reminder(n,client):
                             "emoji": True,
                             "text": "Request for a day-off"
                         },
-                        "value": "value-0"
-                    },
-                    {
-                        "text": {
-                            "type": "plain_text",
-                            "emoji": True,
-                            "text": "Continuing Yesterday's work"
-                        },
-                        "value": "value-1"
+                        "value": "dayoff"
                     }
                 ]
             }
