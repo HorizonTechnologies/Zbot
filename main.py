@@ -851,6 +851,11 @@ def _handling_message(event_data):
                 
             elif dat.startswith("resources"):
                 resourcemodule.showresources(slack_client, channel_id)
+            elif dat.startswith("set"):
+
+                time = dat[4:]
+
+
                 
                 
                 
@@ -875,5 +880,5 @@ if __name__ == "__main__":
     
     host = os.getenv("server_host")
     Thread(target=_reminders,daemon=True).start()
-    app.run(port=port)
-    #app.run(host=host, port=int(port), ssl_context=context)
+    
+    app.run(host=host, port=int(port), ssl_context=context)
