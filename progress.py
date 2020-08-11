@@ -18,10 +18,7 @@ icon = 'https://img.icons8.com/emoji/96/000000/penguin--v2.png'
 
 
 def insert2(userid,data,d):
-    if d==0:
-        date = str(datetoday)
-    else:
-        date = str(tomorrow)
+    
     try:
     
         cursor = conn.cursor()
@@ -45,11 +42,11 @@ def show(user):
     cursor.execute(query, (user, datetoday, ))
     record = cursor.fetchall()
     return record
-    print(record)
+    
 
 
 def dayoff(user):
-    date = str(datetoday)
+    
     try:
         cursor = conn.cursor()
         query = """select * from dayoff where slack_id = %s"""
@@ -70,17 +67,7 @@ def dayoff(user):
         return "an error occured"
 
 
-    check = db.child("dayoffs").child(date).get()
-    if check.val()!=None:
-        
-        data = check.val().values()
-        if user in data:
-            print('err')
-           
-            return "You've already requested!"
-            
-        else:
-            db.child("dayoffs").child(date).push(user)
+    
 
 
 def report(user,channel,slack_client):

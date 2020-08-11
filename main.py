@@ -422,6 +422,8 @@ def _handling_message(event_data):
     
     if data.get("subtype") is None and data.get("user") != botid:
         user_id = data['user']
+        if data['text']=='stop':
+            prevtext =""
         if prevtext in chainmessages:
                 if prevtext == chainmessages[0]:
                     usersdata[user_id]={}
@@ -568,7 +570,7 @@ def _handling_message(event_data):
         if message in commands or data['text'].startswith("register "):
            
             
-            work = message
+           
             
             
             if message == 'joke':
@@ -680,7 +682,7 @@ def _handling_message(event_data):
                                     "type": "section",
                                     "text": {
                                         "type": "mrkdwn",
-                                        "text": "*1️⃣ `Submit` command*. Type `sbumit` To submit your today's report"
+                                        "text": "*1️⃣ `Submit` command*. Type `submit` To submit your today's report"
                                     }
                                 },
                                 {
@@ -796,51 +798,13 @@ def _handling_message(event_data):
                 
         
         
-            elif dat.startswith("remind "):
-                user = data['user']
-                channel = data['channel']
-                val = customremind.remind(dat, user, channel)
-                slack_client.api_call(
-            "chat.postMessage",
-                    channel=channel_id,
-                    text=val,
-                    icon_url=icon,
-                        )
-            elif dat.startswith("today"):
+            
+            
                 
-                work = dat[5:]
-                if work and work.strip():
-                    val = "Great! work You've done. Your work"+ " '"+ work +"' "+" was submitted. Submit any others if you want to."
-                    progress.insert(user_id, work,0)
-                else :
-                    val = "please type something"
-                slack_client.api_call(
-                    "chat.postMessage",
-                    channel=channel_id,
-                    text=val,
-                    icon_url=icon,
-                    )
-                #the work data is stored a string the the 'Work' var
+            
                 
-            elif dat.startswith("next"):
-                userid = data['user']
-               
-                work = dat[4:]
-                
-                if work and work.strip():
-                    val = "Nice! Go on with work. Meanwhile set a remainder of the work or Type Show to check your planned works"
-                    progress.insert(userid, work,1)
-                else :
-                    val = "Please enter details of the work. "
-                slack_client.api_call(
-            "chat.postMessage",
-                    channel=channel_id,
-                    text=val,
-                    icon_url=icon,
-                    )
-                #the work data is stored in a string the the 'Work' var
             elif dat.startswith("show"):
-                colors = ['#EBB713', '#F91C3E', '#16A085', '#212F3D', '#F1C40F']
+                #colors = ['#EBB713', '#F91C3E', '#16A085', '#212F3D', '#F1C40F']
                 user = data['user']
                 progress.report(user, channel_id, slack_client)
                     
@@ -911,5 +875,5 @@ if __name__ == "__main__":
     
     host = os.getenv("server_host")
     Thread(target=_reminders,daemon=True).start()
-    
-    app.run(host=host, port=int(port), ssl_context=context)
+    app.run(port=port)
+    #app.run(host=host, port=int(port), ssl_context=context)
