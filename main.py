@@ -859,7 +859,7 @@ def _handling_message(event_data):
             
     
     
-print(os.getenv("channel"))
+
                 
             
           
