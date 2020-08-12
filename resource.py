@@ -14,11 +14,13 @@ def show():
         query = """select * from resources """
         cursor.execute(query)
         record = cursor.fetchall()
-        #return record
-        print(record)
+  
+        count = cursor.rowcount
+        if count < 1:
+            return ""
 
-        for res in record:
-            print(res[0])
+        
+        
         return record
     except:
         print("err")
@@ -54,6 +56,16 @@ def showresources(slack_client, channel):
     ]          
                                 )
     resource = show()
+    if resource == "":
+        slack_client.api_call(
+                    "chat.postMessage",
+                    channel=channel,
+                    text="No previously added resources found - Try adding a new resource",
+                    icon_url=icon,
+            )
+
+        return  
+
     for res in resource:
                     
                         
@@ -120,11 +132,6 @@ def insert(name, res, user):
             return "Duplicate title, Please choose a different title"
         #return record
         
-        
-        
-    
-        
-        
         query = """ INSERT INTO resources ( slack_id,title, resource, ts) VALUES (%s,%s, %s, %s)"""
         
         insert = (user, name,res,datetime.datetime.now())
@@ -132,12 +139,13 @@ def insert(name, res, user):
         cursor.execute(query, insert)
 
         conn.commit()
-        count = cursor.rowcount
+        
         
         return "successfully inserted "+ name+" - "+ res
 
     except:
-        print("failed to insert")
+        return "Failed to insert"
+        
                
 
 def delete(_id):
@@ -156,8 +164,8 @@ def delete(_id):
     cursor.execute(query,(_id,))
     count = cursor.rowcount
     conn.commit()
-    return record[1]+" - "+record[2]+ "Successfully deleted"
-    print(count)
+    return record[1]+" - "+record[2]+ " Successfully deleted"
+    
 
 
   
