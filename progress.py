@@ -23,7 +23,10 @@ def insert2(userid,data,d):
     
         cursor = conn.cursor()
         data = json.dumps(data)
-        query = """ INSERT INTO standup1 ( slack_id, report, ts) VALUES (%s, %s, %s)"""
+        query = """ INSERT INTO standup1 ( slack_id,
+                                             report,
+                                             ts
+                                        ) VALUES (%s, %s, %s)"""
         insert = (userid,data,datetime.datetime.now())
         cursor.execute(query, insert)
 
@@ -41,12 +44,14 @@ def show(user):
     query = """select report from standup1 where slack_id = %s and ts > %s """
     cursor.execute(query, (user, datetoday, ))
     record = cursor.fetchall()
+    conn.commit()
+
     return record
     
 
 
 def dayoff(user):
-    
+   
     try:
         cursor = conn.cursor()
         query = """select * from dayoff where slack_id = %s"""
@@ -62,6 +67,7 @@ def dayoff(user):
         query = """ INSERT INTO dayoff ( slack_id , ts) VALUES (%s, %s)"""
         insert = (user, datetime.datetime.now())
         cursor.execute(query, insert)
+        conn.commit()
         return "You've requested for a dayoff"
     except:
         return "an error occured"

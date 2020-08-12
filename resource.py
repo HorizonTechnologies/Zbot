@@ -60,7 +60,8 @@ def showresources(slack_client, channel):
         slack_client.api_call(
                     "chat.postMessage",
                     channel=channel,
-                    text="No previously added resources found - Try adding a new resource",
+                    text="No previously added resources found - \
+Try adding a new resource",
                     icon_url=icon,
             )
 
@@ -124,15 +125,18 @@ def insert(name, res, user):
         query = """select * from resources where title = %s"""
         cursor.execute(query,(name, ))
         count = cursor.rowcount
-        record = cursor.fetchall()
         
         #print(record)
-        print(count)
+        
         if count>=1:
             return "Duplicate title, Please choose a different title"
         #return record
         
-        query = """ INSERT INTO resources ( slack_id,title, resource, ts) VALUES (%s,%s, %s, %s)"""
+        query = """ INSERT INTO resources ( slack_id,
+                                            title,
+                                            resource, 
+                                            ts
+                                            ) VALUES (%s,%s, %s, %s)"""
         
         insert = (user, name,res,datetime.datetime.now())
         
