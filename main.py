@@ -736,7 +736,15 @@ Type `resources` to display the resources of the "+Companyname\
                                     "type": "section",
                                     "text": {
                                         "type": "mrkdwn",
-                                        "text": "4️⃣ Zbot is really friendly, \
+                                        "text": "*4️⃣ `set` and `unset` \
+commands*. To let the"+ botname+"know when should it remind you"
+                                    }
+                                },
+                                {
+                                    "type": "section",
+                                    "text": {
+                                        "type": "mrkdwn",
+                                        "text": "5️⃣ Zbot is really friendly, \
 type `joke`, zbot will send a funny joke to you. More features are on the way"
                                     }
                                 }

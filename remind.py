@@ -80,7 +80,7 @@ def deletereminder(_id):
     count = cursor.rowcount
     if count<1:
         return "Refresh the command"
-    record = cursor.fetchone()
+    
     
     query = """DELETE FROM reminders WHERE id = %s"""
     cursor.execute(query,(_id,))
