@@ -64,7 +64,7 @@ commands = ['hello','hello','help','joke']
 schedule.every().day.at(custom.time1).do(remind.reminder,'0',slack_client)
 
 schedule.every().day.at(custom.time2).do(remind.reminder,'0',slack_client)
-schedule.every(1).seconds.do(remind.sendreminder, slack_client)
+#schedule.every(1).seconds.do(remind.sendreminder, slack_client)
 
 
 
