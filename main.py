@@ -23,6 +23,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+botname = custom.botname
+Companyname = custom.companyname
 icon = custom.icon
 preveventid = ""
 prevtext=""
@@ -62,16 +64,16 @@ commands = ['hello','hello','help','joke']
 schedule.every().day.at(custom.time1).do(remind.reminder,'0',slack_client)
 
 schedule.every().day.at(custom.time2).do(remind.reminder,'0',slack_client)
+schedule.every(1).seconds.do(remind.sendreminder, slack_client)
 
 
-                                
 
 def _reminders():
     """
     Loop to check the pending remainders 
     """
     while True:
-        time.sleep(10)
+        time.sleep(55)
         schedule.run_pending()
 
   
@@ -161,6 +163,23 @@ def _message_actions():
                     
                         }]
                         )
+                if value.startswith('timer'):
+                    del_id= value[5:]
+                    val = remind.deletereminder(del_id)
+                    slack_client.api_call(
+                        "chat.postMessage",
+                        channel= channel_id,
+                        text ="",
+                        icon_url=icon,
+                        attachments=[{
+                    "text": val,
+                    "color": "#3AA3E3",
+                    "attachment_type": "default",
+                    
+                        }]
+                        )
+
+
                     
             if value == 'resourceadd':
                 open_dialog = slack_client.api_call(
@@ -471,7 +490,7 @@ def _handling_message(event_data):
                             val =""
                             for response in usersdata[user_id]:
                                 val = val+  "*"+response+"*" +"\n \
-                                    "+ usersdata[user_id][response]+"\n"
+"+ usersdata[user_id][response]+"\n"
                                 
                                 
                                 slack_client.api_call(
@@ -682,8 +701,8 @@ def _handling_message(event_data):
                                     "type": "section",
                                     "text": {
                                         "type": "mrkdwn",
-                                        "text": "Hey there 👋 I'm Your Horizon\
-slackbot . I'm here to help you create and manage tasks in Slack" 
+                                        "text": "Hey there 👋 I'm Your "\
++botname+" . I'm here to help you create and manage tasks in Slack" 
 
                                             }
                                     },
@@ -709,8 +728,8 @@ slackbot . I'm here to help you create and manage tasks in Slack"
                                     "text": {
                                         "type": "mrkdwn",
                                         "text": "*3️⃣ `Resources` command*. \
-Type `resources` to display the resources of the HorizonTech that you will be \
-working on"
+Type `resources` to display the resources of the "+Companyname\
++" that you will be working on"
                                     }
                                 },
                                 {
@@ -728,7 +747,8 @@ type `joke`, zbot will send a funny joke to you. More features are on the way"
             dat.startswith("show") or dat.startswith("register ") or  \
             dat.startswith("resource add") or dat.startswith("resources") or \
             dat.startswith("resource delete ") or dat.startswith("submit") or \
-            dat.startswith("remind "):
+            dat.startswith("remind ") or dat.startswith("set") or\
+            dat.startswith("unset")    :
             """
             
             if user_id not in studentslist:
@@ -819,23 +839,116 @@ know your progress",
                 
                 
             elif dat.startswith("resources"):
-                resourcemodule.showresources(slack_client, channel_id)
-            elif dat.startswith("set"):
                 
-                time = dat[4:]
-                time=time.split()[1] 
+                resourcemodule.showresources(slack_client, channel_id)
+            
+            
+            elif dat.startswith("set"):
 
-                if len(time)==4:
-                    
-                    hour = time[0]
-                    minute = time[2:4]
-                    
-                    
-                    
+                
+                time=dat.split()[1] 
+                
+
+                hour = time[0]
+                minute = time[2:4]
+                
                 if len(time)==5:
-                    
                     hour = time[0:2]
                     minute = time[3:5]
+                
+                
+                val="Please set time in 24Hours Format. Like 'set 20:30'"
+               
+                try:
+                    hour = int(hour)
+                    minute = int(minute)
+                    if hour ==0 or hour >=24:
+                        val = "err"
+                    
+                    if minute >=60:
+                        val = "err"
+                     
+                    timer = str(hour)+":"+str(minute)
+
+                    val= 1
+                    
+                    
+                except:
+                    val ="err with code"
+                if val ==1:
+                    val = remind.setreminder(user_id, timer)
+
+                    slack_client.api_call(
+                            "chat.postMessage",
+                            text = val,
+                            icon_url = icon,
+                            channel = channel_id
+
+                    )
+            elif dat.startswith("unset"):
+                timers = remind.unset(user_id)
+                order = 0
+                if timers =="":
+                    slack_client.api_call(
+                            "chat.postMessage",
+                                channel=channel_id,
+                                text="You haven't set a reminder yet! Use 'set \
+19:30' Please use 24hours format",
+                                icon_url=icon,
+                        )
+
+                for timer in timers:
+                    order = order +1       
+                                    
+                    slack_client.api_call(
+                            "chat.postMessage",
+                                channel=channel_id,
+                                text=str(order)+". "+ timer[0],
+                                icon_url=icon,
+                        )
+                    slack_client.api_call(
+                            "chat.postMessage",
+                            channel=channel_id,
+                            text="",
+                            icon_url=icon,
+                            blocks= [
+                                    {
+                                    "type": "actions",
+                                    "elements": [
+                                        
+                                        {
+                                            "type": "button",
+                                            "text": {
+                                                "type": "plain_text",
+                                                "emoji": True,
+                                                "text": "Update"
+                                                
+                                            },
+                                            "style": "danger",
+                                            "value": "timer"+str(timer[1])
+                                        },
+                                        {
+                                            "type": "button",
+                                            "text": {
+                                                "type": "plain_text",
+                                                "emoji": True,
+                                                "text": "Delete"
+                                            },
+                                            "style": "danger",
+                                            "value": "timer"+str(timer[1])
+                                        }
+                                    ]
+                                    }
+                                    ]
+                            
+                            )
+
+
+
+                    
+                    
+                    
+
                     
 
 

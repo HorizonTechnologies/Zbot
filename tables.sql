@@ -28,4 +28,13 @@ ts timestamp
 
 
 )
+create table reminders(
+id serial primary key,
+slack_id varchar(30),
+timetoset varchar(10),
+ts timestamp
+
+
+
+)
 

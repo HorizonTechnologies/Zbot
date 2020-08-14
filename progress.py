@@ -50,6 +50,9 @@ def show(user):
     
 
 
+
+
+
 def dayoff(user):
    
     try:
@@ -78,6 +81,31 @@ def dayoff(user):
 
 def report(user,channel,slack_client):
     report = show(user)
+    slack_client.api_call(
+            "chat.postMessage",
+            channel = channel,
+            icon_url=icon,
+            text = f" Great Work! <@{user}> "
+    )
+    slack_client.api_call(
+                        "chat.postMessage",
+                        channel=channel,
+                        text= "Your responses",
+                        icon_url=icon,
+                        blocks = [
+                            {
+                                "type":"section",
+                                "text":{
+                                    "type":"mrkdwn",
+                                    "text": f"`"\
++str(datetime.datetime.now().strftime("%D"))+"` You've submitted *"+ \
+str(len(report))+"* report's today" 
+
+                                    
+                                }
+                            }
+                        ]
+    )
                 
     for response in report:
         val =""

@@ -1,12 +1,108 @@
 
 icon = 'https://img.icons8.com/emoji/96/000000/penguin--v2.png'
+import db
+import datetime
+
+conn = db.db()
+import blocks
+
+remindersblock = blocks.reminder
+
+
+reminders = {}
+
+def sendreminder(slack_client):
+    x = datetime.datetime.now()
+    currenttime = x.strftime("%H") +":"+x.strftime("%M")
+  
+    for time in reminders:
+        if currenttime == time[1]:
+            remindersblock(slack_client, time[0])
+           
 
 
 
 
-
+def setreminder(user, timetoset):
+    global reminders
     
+    try:
+        cursor = conn.cursor()
+        query = """select * from reminders where slack_id = %s"""
+        cursor.execute(query,(user, ))
+        count = cursor.rowcount
+        
+        #print(record)
+      
+        if count>2:
+            return "You can set a maximum of 2 reminders per day. Contact us\
+if you need any help"
+        #return record
 
+        query = """ INSERT INTO reminders ( slack_id ,
+                                            timetoset,
+                                                 ts) VALUES (%s, %s, %s)"""
+        insert = (user, timetoset, datetime.datetime.now())
+        cursor.execute(query, insert)
+        
+        conn.commit()
+        getreminders()
+        return "Success"
+        
+
+
+
+
+        
+    except:
+        return "an error occured"
+def getreminders():
+    global reminders
+    cursor = conn.cursor()
+    query = """select slack_id, timetoset from reminders"""
+    cursor.execute(query)
+    record = cursor.fetchall()
+    conn.commit()
+
+    reminders =  record
+   
+    return record
+
+reminders = getreminders()
+
+def deletereminder(_id):
+    cursor = conn.cursor()
+    _id = int(_id)
+    
+    
+    query = """select * from reminders where id = %s"""
+    cursor.execute(query,(_id, ))
+    count = cursor.rowcount
+    if count<1:
+        return "Refresh the command"
+    record = cursor.fetchone()
+    
+    query = """DELETE FROM reminders WHERE id = %s"""
+    cursor.execute(query,(_id,))
+    count = cursor.rowcount
+    conn.commit()
+    return "Successfully deleted"
+
+
+def unset(user):
+    cursor = conn.cursor()
+    query = """select timetoset,id from reminders where slack_id = %s"""
+    cursor.execute(query, (user,))
+    record = cursor.fetchall()
+    count = cursor.rowcount
+    conn.commit()
+    if count <1:
+        return "err"
+   
+
+    reminders =  record
+    
+    return record
 
 
 
@@ -17,6 +113,8 @@ def reminder(n,client):
     for s in userslist['members']:
         if s['is_bot']!= True:
             user = s['id']
+
+            remindersblock(client, user)
             
             
                 

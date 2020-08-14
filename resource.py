@@ -8,6 +8,8 @@ icon = 'https://img.icons8.com/emoji/96/000000/penguin--v2.png'
 
 
 
+
+
 def show():
     try:
         cursor = conn.cursor()
@@ -36,7 +38,7 @@ def showresources(slack_client, channel):
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": "Add a new resource"
+                "text": ":bulb: *Resources*: \n"
             }
         },
         {
@@ -66,16 +68,16 @@ Try adding a new resource",
             )
 
         return  
-
+    order=0
     for res in resource:
-                    
+        order = order +1       
                         
                         
         
         slack_client.api_call(
 "chat.postMessage",
                     channel=channel,
-                    text=res[1] +" - "+ res[2],
+                    text= str(order) +". "+ res[1] +" - "+ res[2],
                     icon_url=icon,
             )
         slack_client.api_call(
