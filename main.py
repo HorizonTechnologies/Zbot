@@ -737,8 +737,9 @@ Type `resources` to display the resources of the "+Companyname\
                                     "text": {
                                         "type": "mrkdwn",
                                         "text": "*4️⃣ `set` and `unset` \
-commands*. To let the"+ botname+"know when should it remind you"
-                                    }
+commands*. To let the "+ botname+" know when should it remind you \n Use \
+`set 18:30` to set the reminder and `unset` to edit. "                                    
+}
                                 },
                                 {
                                     "type": "section",
@@ -865,43 +866,43 @@ know your progress",
                     minute = time[3:5]
                 
                 
-                val="Please set time in 24Hours Format. Like 'set 20:30'"
+                
                
                 try:
                     hour = int(hour)
                     minute = int(minute)
-                    if hour ==0 or hour >=24:
-                        val = "err"
-                    
-                    if minute >=60:
-                        val = "err"
-                     
-                    timer = str(hour)+":"+str(minute)
+                    if hour!=0 and hour <24 and minute <=60:
+                        timer = str(hour)+":"+str(minute)
 
-                    val= 1
+                        val = remind.setreminder(user_id, timer)
+                    else:  
+                        val = "Please set valid time format like 'set 20:30'"
+                        return
+                    
                     
                     
                 except:
-                    val ="err with code"
-                if val ==1:
-                    val = remind.setreminder(user_id, timer)
+                    val="Please set time in 24Hours Format. Like 'set 20:30'"
+                
+                
 
-                    slack_client.api_call(
-                            "chat.postMessage",
-                            text = val,
-                            icon_url = icon,
-                            channel = channel_id
+                slack_client.api_call(
+                        "chat.postMessage",
+                        text = val,
+                        icon_url = icon,
+                        channel = channel_id
 
-                    )
+                )
             elif dat.startswith("unset"):
                 timers = remind.unset(user_id)
+                print("w")
                 order = 0
                 if timers =="":
                     slack_client.api_call(
                             "chat.postMessage",
                                 channel=channel_id,
-                                text="You haven't set a reminder yet! Use 'set \
-19:30' Please use 24hours format",
+                                text="You haven't set a reminder yet! `set \
+19:30` to set one",
                                 icon_url=icon,
                         )
 

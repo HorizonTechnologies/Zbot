@@ -34,8 +34,8 @@ def setreminder(user, timetoset):
         
         #print(record)
       
-        if count>2:
-            return "You can set a maximum of 2 reminders per day. Contact us\
+        if count >=2:
+            return "You can set a maximum of 2 reminders per day. Contact us \
 if you need any help"
         #return record
 
@@ -59,14 +59,20 @@ if you need any help"
 def getreminders():
     global reminders
     cursor = conn.cursor()
-    query = """select slack_id, timetoset from reminders"""
-    cursor.execute(query)
-    record = cursor.fetchall()
-    conn.commit()
-
-    reminders =  record
    
-    return record
+    try:
+        query = """select slack_id, timetoset from reminders"""
+        cursor.execute(query)
+        record = cursor.fetchall()
+        conn.commit()
+        reminders =  record
+        return record
+    except:
+        return ""
+
+    
+   
+    
 
 reminders = getreminders()
 
@@ -81,26 +87,29 @@ def deletereminder(_id):
     if count<1:
         return "Refresh the command"
     
-    
-    query = """DELETE FROM reminders WHERE id = %s"""
-    cursor.execute(query,(_id,))
-    count = cursor.rowcount
-    conn.commit()
+    try:
+        query = """DELETE FROM reminders WHERE id = %s"""
+        cursor.execute(query,(_id,))
+        count = cursor.rowcount
+        conn.commit()
+    except:
+        return "Failed to insert"
+    getreminders()
     return "Successfully deleted"
 
 
 def unset(user):
     cursor = conn.cursor()
-    query = """select timetoset,id from reminders where slack_id = %s"""
-    cursor.execute(query, (user,))
-    record = cursor.fetchall()
-    count = cursor.rowcount
-    conn.commit()
+    try:
+        query = """select timetoset,id from reminders where slack_id = %s"""
+        cursor.execute(query, (user,))
+        record = cursor.fetchall()
+        count = cursor.rowcount
+        conn.commit()
+    except:
+        return ""
     if count <1:
-        return "err"
-   
-
-    reminders =  record
+        return ""
     
     return record
 
