@@ -29,9 +29,10 @@ icon = custom.icon
 preveventid = ""
 prevtext=""
 usersdata = {}
-chainmessages = ['What have you done today?',
-                     "What are your next plans",
-                     "Need help with anything"]
+
+#report questions to ask
+chainmessages = custom.reportquestions
+
 
 
 
@@ -988,5 +989,5 @@ if __name__ == "__main__":
     
     host = os.getenv("local_host")
     Thread(target=_reminders,daemon=True).start()
-    
+  
     app.run(host=host, port=int(port), ssl_context=context)

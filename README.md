@@ -6,9 +6,14 @@ Zbot specifications : [zbot features and specs](https://github.com/HorizonTechno
 
 Zbot, A horizon slackbot. after a student gets registered successfully with the zbot, He/she can be able to use the Zbot full functional.
 
-Features :
+### You can customize the bot icon, botname, Default reminder time and the report questions in the `custom.py` file
 
-What do we have now?
+### Features :
+
+  
+
+#### What do we have now?
+
 
 -   Our main feature, Daily standup. Saving the student's everyday progress. What he was working on, Whether he is on leave. So that he can have an idea of what he has done yesterday and can proceed further works etc..
     
@@ -18,12 +23,15 @@ What do we have now?
 
     
 -  Fun, Zbot also helps as a simple stressbuster by sending random jokes and Many other functionalities like the latest news, notifications will be added.
-    
 
-To-Do List:
+- Managing student's attendance, Where he can request for a day off in the slack itself, and those going through daily sync-up can be considered as those who attended.
+  
 
--   Providing admin like privileges to one who handles everything like handling resources, permissions/requests, Communication with all of the students at very ease(This works better than groups(channels), interacting with a student in a DM, not in-group/channel)
-    
--   Making bot of multipurpose use such as send latest news, notifications and in sending any messages
-    
--   Managing student's attendance, Where he can request for a day off in the slack itself, and those going through daily sync-up can be considered as those who attended.
+#### To-Do List:
+
+  
+
+- Providing admin like privileges to one who handles everything like handling resources, permissions/requests, Communication with all of the students at very ease(This works better than groups and channels, interacting with a student in a DM, not in-group/channel)
+
+- Making bot of multipurpose use such as send latest news, notifications and in sending any messages
+

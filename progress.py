@@ -99,7 +99,7 @@ def report(user,channel,slack_client):
                                     "type":"mrkdwn",
                                     "text": f"`"\
 +str(datetime.datetime.now().strftime("%D"))+"` You've submitted *"+ \
-str(len(report))+"* report's today" 
+str(len(report))+"* reports today" 
 
                                     
                                 }

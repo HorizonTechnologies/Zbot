@@ -8,3 +8,9 @@ time2="20:00"
 icon = "https://img.icons8.com/emoji/96/000000/penguin--v2.png"
 botname = "HorizonBOT"
 companyname = "HorizonTECH"
+
+#report questions to ask
+
+reportquestions = ['What have you done today?',
+                     "What are your next plans",
+                     "Need help with anything",]
