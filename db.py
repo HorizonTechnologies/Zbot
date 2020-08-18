@@ -6,6 +6,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def db():
+    """
+    postgres DB Connections
+    getting user, password,host,port, database variables from environment
+
+    """
     try:
         
         user =  os.getenv("user")

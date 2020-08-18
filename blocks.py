@@ -1,5 +1,9 @@
 icon = 'https://img.icons8.com/emoji/96/000000/penguin--v2.png'
 def divider(slack_client,channel):
+    """
+    Divider blocks class
+
+    """
     slack_client.api_call(
                         "chat.postMessage",
                         channel=channel,
@@ -13,6 +17,10 @@ def divider(slack_client,channel):
                                 }
                                 ])
 def reminder(slack_client, user):
+    """
+    Remainder message blocks
+
+    """
     slack_client.api_call(
                   "chat.postMessage",
                   as_user=True,

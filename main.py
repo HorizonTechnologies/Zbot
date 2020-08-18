@@ -367,7 +367,7 @@ def _handle_message(event_data):
     #returning the post request with HTTP 200
     return make_response("", 200)
         
-def quickactions(channel):
+def _quickactions(channel):
     slack_client.api_call(
                             "chat.postMessage",
                             channel=channel,
@@ -514,12 +514,6 @@ def _handling_message(event_data):
                             
                             channel = os.getenv("channel")
                             
-                            slack_client.api_call(
-                                "chat.postMessage",
-                                channel= channel,
-                                text="hj",
-
-                            )
                             text=f":bell: <@{user_id}> has submitted a report!"
                             slack_client.api_call(
                                                 "chat.postMessage",
@@ -751,7 +745,7 @@ type `joke`, zbot will send a funny joke to you. More features are on the way"
                                     }
                                 }
                             ] )             
-                quickactions(channel_id)
+                _quickactions(channel_id)
         
         elif dat.startswith("today") or dat.startswith("next") or  \
             dat.startswith("show") or dat.startswith("register ") or  \
@@ -871,11 +865,14 @@ know your progress",
                
                 try:
                     hour = int(hour)
+                    minutes = minute
                     minute = int(minute)
+                    
                     if hour!=0 and hour <24 and minute <=60:
-                        timer = str(hour)+":"+str(minute)
+                        timer = str(hour)+":"+str(minutes)
 
                         val = remind.setreminder(user_id, timer)
+                        print(timer)
                     else:  
                         val = "Please set valid time format like 'set 20:30'"
                         return
@@ -989,5 +986,5 @@ if __name__ == "__main__":
     
     host = os.getenv("local_host")
     Thread(target=_reminders,daemon=True).start()
-  
+    #app.run(port=port)
     app.run(host=host, port=int(port), ssl_context=context)

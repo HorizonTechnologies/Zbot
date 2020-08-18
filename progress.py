@@ -18,6 +18,12 @@ icon = 'https://img.icons8.com/emoji/96/000000/penguin--v2.png'
 
 
 def insert2(userid,data,d):
+    """
+    Inserting reports into table standup1
+
+
+
+    """
     
     try:
     
@@ -40,6 +46,10 @@ def insert2(userid,data,d):
 
 
 def show(user):
+    """
+    Getting user's day reports with their slack_id
+    """
+
     cursor = conn.cursor()
     query = """select report from standup1 where slack_id = %s and ts > %s """
     cursor.execute(query, (user, datetoday, ))
@@ -54,11 +64,13 @@ def show(user):
 
 
 def dayoff(user):
-   
+    """
+    Inserting user dayoff request in the dayoff table
+    """
     try:
         cursor = conn.cursor()
-        query = """select * from dayoff where slack_id = %s"""
-        cursor.execute(query,(user, ))
+        query = """select * from dayoff where slack_id = %s and ts> %s"""
+        cursor.execute(query,(user, datetoday ))
         count = cursor.rowcount
         
         #print(record)
@@ -80,13 +92,20 @@ def dayoff(user):
 
 
 def report(user,channel,slack_client):
+
+    """
+    Displaying day reports blocks to the user
+    """
     report = show(user)
-    slack_client.api_call(
-            "chat.postMessage",
-            channel = channel,
-            icon_url=icon,
-            text = f" Great Work! <@{user}> "
-    )
+
+    if len(report)!=0:
+
+        slack_client.api_call(
+                "chat.postMessage",
+                channel = channel,
+                icon_url=icon,
+                text = f" Great Work! <@{user}> "
+        )
     slack_client.api_call(
                         "chat.postMessage",
                         channel=channel,

@@ -26,8 +26,14 @@ def show():
         return record
     except:
         print("err")
+        return ""
 
 def showresources(slack_client, channel):
+
+    """
+    
+
+    """
     slack_client.api_call(
             "chat.postMessage",
                                 channel=channel,
@@ -119,6 +125,9 @@ Try adding a new resource",
 
      
 def insert(name, res, user):
+    """
+    Inserting the resources (title, resource, slack_id, ts) into the resource db
+    """
     name = name.lower()
     res = res.lower()
 
@@ -152,9 +161,11 @@ def insert(name, res, user):
     except:
         return "Failed to insert"
         
-               
 
 def delete(_id):
+    """
+    Deleting the resources from the resources DB
+    """
     cursor = conn.cursor()
     _id = int(_id)
     

@@ -12,6 +12,10 @@ remindersblock = blocks.reminder
 reminders = {}
 
 def sendreminder(slack_client):
+    """
+    Comparing the remainders with current time and sending remainders to the \
+users
+    """
     x = datetime.datetime.now()
     currenttime = x.strftime("%H") +":"+x.strftime("%M")
   
@@ -24,6 +28,9 @@ def sendreminder(slack_client):
 
 
 def setreminder(user, timetoset):
+    """
+    Inserting remainders to the remainders table 
+    """
     global reminders
     
     try:
@@ -57,6 +64,10 @@ if you need any help"
     except:
         return "an error occured"
 def getreminders():
+    """
+    Getting the remainders list and storing them in the global variable\
+'remainders'
+    """
     global reminders
     cursor = conn.cursor()
    
@@ -77,6 +88,9 @@ def getreminders():
 reminders = getreminders()
 
 def deletereminder(_id):
+    """
+    deleting the remainders set by the user with block actions
+    """
     cursor = conn.cursor()
     _id = int(_id)
     
@@ -99,6 +113,10 @@ def deletereminder(_id):
 
 
 def unset(user):
+    """
+    getting the remainders from the the remainders table, when a user \
+invokes `unset` command
+    """
     cursor = conn.cursor()
     try:
         query = """select timetoset,id from reminders where slack_id = %s"""
@@ -118,6 +136,10 @@ def unset(user):
 
 
 def reminder(n,client):
+    """
+    Sending remainders to the users at the default time given in custom.py \
+everyday by retreiving the users list after calling users.test api call
+    """
     userslist = client.api_call("users.list")
     for s in userslist['members']:
         if s['is_bot']!= True:
