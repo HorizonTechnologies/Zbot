@@ -14,6 +14,7 @@ create table resources(
 id serial primary key,
 title varchar(30),
 resource varchar(200),
+slack_id varchar(10),
 ts timestamp
 
 
